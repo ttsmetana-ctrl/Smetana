@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Счетчик визитов</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, sans-serif;
+      text-align: center;
+    }
+    .counter-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .label {
+      font-size: 1.2rem;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .count {
+      font-size: clamp(4rem, 18vw, 10rem);
+      font-weight: 800;
+      color: #38bdf8;
+      text-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+    }
+    .share-btn {
+      margin-bottom: 3rem;
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0f172a;
+      background-color: #38bdf8;
+      border: none;
+      border-radius: 9999px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="counter-container">
+    <div class="label">Уникальных визитов</div>
+    <div class="count" id="counter">...</div>
+  </div>
+
+  <button class="share-btn" id="shareBtn">Поделиться сайтом</button>
+
+  <script>
+    fetch('/api/visit')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('counter').innerText = data.count || 0;
+      })
+      .catch(() => {
+        document.getElementById('counter').innerText = '0';
+      });
+
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+      const shareData = {
+        title: 'Уникальный счетчик',
+        text: 'Посмотри, сколько людей уже зашло!',
+        url: window.location.href
+      };
+
+      if (navigator.share) {
+        try { await navigator.share(shareData); } catch (e) {}
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Ссылка скопирована!');
+      }
+    });
+  </script>
+</body>
+</html>
